@@ -747,7 +747,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "injectotron"
+name = "injection-tester"
 version = "0.1.0"
 dependencies = [
  "async-trait",
@@ -972,8 +972,9 @@ dependencies = [
 
 [[package]]
 name = "pantry-rs"
-version = "0.0.3"
-source = "git+https://github.com/juliamerz/pantry-rs?branch=main#63b56080172b3edab2cb2fd16f8039b9c561b825"
+version = "0.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d0487070f901848a855cf17270d49e4b0ea5317312f273578fbbea3698b587dc"
 dependencies = [
  "chrono",
  "futures",

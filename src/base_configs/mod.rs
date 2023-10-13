@@ -8,6 +8,7 @@ pub fn get_pub_base_configs() -> HashMap<String, Vec<BaseConfig>> {
     let mut map = HashMap::new();
     map.insert("pub_".to_string()+"llama2", public::llama2::config());
     map.insert("pub_".to_string()+"example", public::example::config());
+    map.insert("pub_".to_string()+"openai", public::openai::config());
     map
 }
 

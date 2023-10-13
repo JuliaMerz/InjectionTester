@@ -40,19 +40,19 @@ struct Cli {
     #[arg(short, long)]
     include_remote: bool,
 
-    /// List of base config files, separated by commas base1,base2
+    /// List of base config files, separated by commas pub_base1,priv_base2
     #[arg(short, long, value_parser=string_to_vec)]
     base_configs: Option<std::vec::Vec<String>>,
 
-    /// List of config files, separated by commas: conf1,conf2
+    /// List of config files, separated by commas: pub_conf1,priv_conf2
     #[arg(short='c', long, value_parser=string_to_vec)]
     additional_configs: Option<std::vec::Vec<String>>,
 
-    /// List of attack files, separated by commas: attack1,attack2
+    /// List of attack files, separated by commas: pub_attack1,priv_attack2
     #[arg(short, long, value_parser=string_to_vec)]
     attacks: Option<std::vec::Vec<String>>,
 
-    /// List of mitigation files. You can chain multiple by using '|': first|second,other
+    /// List of mitigation files. You can chain multiple by using '|': pub_first|priv_second,pub_other
     #[arg(short, long, value_parser=string_to_vec_vec)]
     mitigations: Option<std::vec::Vec<Vec<String>>>,
 }

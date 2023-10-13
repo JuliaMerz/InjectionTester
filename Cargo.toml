@@ -1,12 +1,12 @@
 [package]
-name = "injectotron"
+name = "injection-tester"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-pantry-rs = { git = "https://github.com/juliamerz/pantry-rs", branch = "main" }
+pantry-rs = "0.0.4"
 quick-error = "2.0.1"
 uuid = { version = "1.3.4", features = ["serde"] }
 reqwest = { version = "0.11.18", features = ["serde_json", "stream"] }

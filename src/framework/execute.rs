@@ -1,6 +1,7 @@
 use crate::framework::structures::{CompletedRun, Evaluation, FullConfig};
 use crate::framework::vulnerability::evaluate_vulnerability;
 use futures::future::join_all;
+use futures::prelude::*;
 use futures::StreamExt;
 use log::{debug, error, info, warn, LevelFilter};
 use pantry_rs::interface::{LLMConnectorType, LLMEventInternal};
@@ -63,24 +64,34 @@ pub async fn execute_full_runs(
     for full_config in full_runs.into_iter() {
         let client = pantry_client.clone();
         let full_conf = full_config.clone();
-        config_joins.push(tokio::spawn(async move {
-            let mut config_set = Vec::new();
-            for i in 0..n {
-                let res = execute_run(&client, full_conf.clone()).await;
-                config_set.push(CompletedRun {
-                    config: full_conf.clone(),
-                    result: res,
-                });
-            }
-            config_set
-        }));
-    }
-    // let mut completed_runs = Vec::new();
-    let join_results: Result<Vec<Vec<CompletedRun>>, tokio::task::JoinError> =
-        join_all(config_joins.into_iter())
+        // We're wrapping the tokio spawn in an async here so that buffer_unordered
+        // lets us run two at a time—otherwise the tokio spawn triggers before
+        // await gets called internally.
+        config_joins.push(async {
+            tokio::spawn(async move {
+                let mut config_set = Vec::new();
+                for i in 0..n {
+                    let res = execute_run(&client, full_conf.clone()).await;
+                    config_set.push(CompletedRun {
+                        config: full_conf.clone(),
+                        result: res,
+                    });
+                }
+                config_set
+            })
             .await
-            .into_iter()
-            .collect();
+        });
+    }
+    let stream = futures::stream::iter(config_joins).buffer_unordered(2);
+
+    // wait for all futures to complete
+    let join_results: Result<Vec<Vec<CompletedRun>>, tokio::task::JoinError> =
+        stream.collect::<Vec<_>>().await.into_iter().collect();
+    // let join_results: Result<Vec<Vec<CompletedRun>>, tokio::task::JoinError> =
+    //     join_all(config_joins.into_iter())
+    //         .await
+    //         .into_iter()
+    //         .collect();
     let completed_runs: Result<Vec<Vec<CompletedRun>>, String> =
         join_results.map_err(|e| format!("Join error: {:?}", e));
 
